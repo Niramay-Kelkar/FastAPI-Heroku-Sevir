@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import os
-#from apinew import *
+from LocationFetch2 import prediction
+from apinew import *
 
 st.title('NOWCASTING')
 
@@ -22,7 +23,31 @@ def get_pred(location_name: str , year : int , month :int, day : int):
     if os.path.exists(filep):
       return FileResponse(filep , media_type="image/jpeg", filename= "myfin.jpg")
     return {"error:file not found"}
+
 img = get_pred(title,year,month,date)
+
+def prediction(location_name, year, month, day):
+  # Calling the location function to get the path of the downloaded h5 file
+  data = Location(location_name)
+      
+  if __name__ == '__main__':
+      log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+      logging.basicConfig(level=logging.INFO, format=log_fmt)
+      main()
+
+  model = "./models/mse_model.h5"
+  mse_model = tf.keras.models.load_model(model,compile=False,custom_objects={"tf":tf})
+
+  x_test, y_test = read_data('./nowcast_testing.h5', end=50)
+
+  loc = randint(10,19)
+  y_pred = mse_model.predict(x_test)
+  if isinstance(y_pred,(list,)):
+    y_pred=y_pred[0]
+  y_preds.append(y_pred+norm['scale']+norm['shift'])
+
+  res = imgsave(loc ,location_name, y_preds)
+  return res
 
 from PIL import Image
 image = Image.open('images/'+str(title)+ '/files/fin.jpg')
