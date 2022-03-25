@@ -1,0 +1,6 @@
+tensorflow
+pandas
+pillow
+fastapi
+uvicorn
+gunicorn
