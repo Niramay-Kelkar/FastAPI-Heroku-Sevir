@@ -6,3 +6,4 @@ uvicorn
 gunicorn
 geopy
 matplotlib
+boto3
