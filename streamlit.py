@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from apinew import *
+import os
+#from apinew import *
 
 st.title('NOWCASTING')
 
