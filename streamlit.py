@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import os
-from LocationFetch2 import prediction
+from LocationFetch2 import *
 from apinew import *
 
 st.title('NOWCASTING')
