@@ -8,6 +8,7 @@ $ uvicorn apinew:app --reload
 Streamlit:
 $ streamlit run streamlit.py
 
+It will run on http://localhost:8501/ 
 
 
 ### References:
