@@ -4,3 +4,4 @@ pillow
 fastapi
 uvicorn
 gunicorn
+geopy
