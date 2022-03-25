@@ -27,7 +27,7 @@ def Location(location_name):
     actual = (getLoc.latitude, getLoc.longitude)
     actual
 
-    aa = pd.read_csv("catalog.csv") 
+    aa = pd.read_csv("CATALOG.csv") 
 
     #aa.head()
 
