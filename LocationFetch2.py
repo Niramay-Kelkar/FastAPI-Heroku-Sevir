@@ -641,13 +641,13 @@ def prediction(location_name, year, month, day):
       logging.basicConfig(level=logging.INFO, format=log_fmt)
       main()
 
-  model = "./models/mse_model.h5"
-  mse_model = tf.keras.models.load_model(model,compile=False,custom_objects={"tf":tf})
+  model = "./models/gan_generator.h5"
+  gan_model = tf.keras.models.load_model(model,compile=False,custom_objects={"tf":tf})
 
   x_test, y_test = read_data('./nowcast_testing.h5', end=50)
 
   loc = randint(10,19)
-  y_pred = mse_model.predict(x_test)
+  y_pred = gan_model.predict(x_test)
   if isinstance(y_pred,(list,)):
     y_pred=y_pred[0]
   y_preds.append(y_pred+norm['scale']+norm['shift'])
