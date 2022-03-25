@@ -1,26 +1,16 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
-#get_ipython().system('pip install geopy')
-
-
-# In[20]:
-
-
 import tensorflow as tf
 import pandas as pd
 from geopy.geocoders import Nominatim
 from geopy import distance
+from readers.nowcast_reader import read_data
 
-
-# In[2]:
+'''
+function returns filepath of the h5 file 
+where it downloaded the respective 'vil' file 
+depending on the location entered
+'''
 def Location(location_name):
 
-    
-     
     # calling the Nominatim tool
     loc = Nominatim(user_agent="GetLoc")
      
@@ -34,31 +24,13 @@ def Location(location_name):
     print("Latitude = ", getLoc.latitude, "\n")
     print("Longitude = ", getLoc.longitude)
 
-
-    # In[3]:
-
-
     actual = (getLoc.latitude, getLoc.longitude)
     actual
 
-
-    # In[4]:
-
-
-    
     aa = pd.read_csv("catalog.csv") 
 
+    #aa.head()
 
-    # In[5]:
-
-
-    aa.head()
-
-
-    # In[6]:
-
-
-    
     dist=[]
     for row in range(0,len(aa)):
         m_lat = aa.iloc[row]["mid_lat"]
@@ -67,98 +39,32 @@ def Location(location_name):
         print(mid_coords)
         dist.append(distance.distance(actual, mid_coords).miles)
 
-
-    # In[7]:
-
-
-    #dist
-
-
-    # In[8]:
-
-
     aa['distance_from_actual'] = dist  
-
-
-    # In[9]:
-
-
-    aa
-
-
-    # In[10]:
-
-
+    
+    #Sorting the value in ascending order to know which file
     aa.sort_values(by = ['distance_from_actual'])
 
-
-    # In[ ]:
-
-
-
-
-    # In[12]:
-
-
     file_loc = aa.iloc[0]['file_name']
-    #file_loc
 
-
-    # In[13]:
-
-
-    #get_ipython().system('pip install boto3')
+    # Using boto3 to connect to s3 buckets
     import boto3
     from botocore.handlers import disable_signing
     resource = boto3.resource('s3')
     resource.meta.client.meta.events.register('choose-signer.s3.*', disable_signing)
     bucket=resource.Bucket('sevir') 
 
-
-    # In[14]:
-
-
     objs=bucket.objects.filter(Prefix='')
     print([o.key for o in objs])
 
-
-
-    # In[15]:
-
-
     file_loc = "data/"+ file_loc
-    print(file_loc)
-
-
-    # In[17]:
-
 
     file_name = file_loc[14:]
     #file_name
     #file_name2= "sevir/vil/2019/" + file_name
 
-
-    # In[18]:
-
-
     bucket.download_file(file_loc,file_name)
 
     return file_name
-
-
-# In[25]:
-from nowcast_reader import read_data
-
-# from nowcast_reader import read_data
-# model = "./mse_model.h5"
-# mse_model = tf.keras.models.load_model(model,compile=False,custom_objects={"tf":tf})
-
-# x_test, y_test = read_data('./nowcast_testing.h5', end=50)
-
-
-# ## Nowcast Generator
-
-# In[31]:
 
 
 """
@@ -180,7 +86,6 @@ from tensorflow.keras.utils import GeneratorEnqueuer
 TYPES    = ['vis','ir069','ir107','vil','lght']
 
 import pathlib
-#_thisdir = str(pathlib.Path(__file__).parent.absolute())
 DEFAULT_CATALOG   = './CATALOG.csv'
 DEFAULT_DATA_HOME = './'
 
@@ -612,11 +517,6 @@ class SEVIRSequence(Sequence):
     
     
  
-
-
-# In[32]:
-
-
 """
 Generator for nowcast dataset
 """
@@ -647,21 +547,6 @@ class NowcastGenerator(SEVIRSequence):
         Ynew = np.concatenate((y1,y2,y3),axis=0)
         return [Xnew],[Ynew]
 
-def get_nowcast_train_generator(sevir_catalog,
-                                sevir_location,
-                                batch_size=8,
-                                start_date=None,
-                                end_date=datetime.datetime(2019,6,1) ):
-    filt = lambda c:  c.pct_missing==0 # remove samples with missing radar data
-    return NowcastGenerator(catalog=sevir_catalog,
-                            sevir_data_home=sevir_location,
-                            x_img_types=['vil'],
-                            y_img_types=['vil'],
-                            batch_size=batch_size,
-                            start_date=start_date,
-                            end_date=end_date,
-                            catalog_filter=filt)
-
 def get_nowcast_test_generator(sevir_catalog,
                                sevir_location,
                                batch_size=8,
@@ -676,17 +561,6 @@ def get_nowcast_test_generator(sevir_catalog,
                             start_date=start_date,
                             end_date=end_date,
                             catalog_filter=filt)
-
-
-
-
-# In[ ]:
-
-
-#Make dataset
-
-
-# In[43]:
 
 
 """
@@ -704,19 +578,10 @@ os.environ["HDF5_USE_FILE_LOCKING"]='FALSE'
 import sys
 import numpy as np
 import tensorflow as tf
-#from nowcast_generator import get_nowcast_train_generator,get_nowcast_test_generator
-'''parser = argparse.ArgumentParser(description='Make nowcast training & test datasets using SEVIR')
-parser.add_argument('--sevir_data', type=str, help='location of SEVIR dataset',default='./')
-parser.add_argument('--sevir_catalog', type=str, help='location of SEVIR dataset',default='./CATALOG.csv')
-parser.add_argument('--output_location', type=str, help='location of SEVIR dataset',default='./')
-parser.add_argument('--n_chunks', type=int, help='Number of chucks to use (increase if memory limited)',default=10)
-
-'''
 
 output_location='./'
 n_chunks=10
 
-#args = parser.parse_args()
 
 def main():
     """ 
@@ -724,13 +589,9 @@ def main():
     """
     logger = logging.getLogger(__name__)
     logger.info('making final data set from raw data')
-    #trn_generator = get_nowcast_train_generator(sevir_catalog=args.sevir_catalog,
-     #                                           sevir_location=args.sevir_data)
     tst_generator = get_nowcast_test_generator(sevir_catalog='./CATALOG.csv',
                                                sevir_location='./sevir')
     
-    #logger.info('Reading/writing training data to %s' % ('%s/nowcast_training.h5' % args.output_location))
-    #read_write_chunks('%s/nowcast_training.h5' % args.output_location,trn_generator,args.n_chunks)
     logger.info('Reading/writing testing data to %s' % ('%s/nowcast_testing.h5' % output_location))
     read_write_chunks('%s/nowcast_testing.h5' % output_location,tst_generator,n_chunks)
 
@@ -760,10 +621,6 @@ def read_write_chunks( filename, generator, n_chunks ):
             hf['OUT'][-Y[0].shape[0]:] = Y[0]
 
 
-# In[63]:
-
-
-
 import os
 import zipfile
 import io
@@ -773,31 +630,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-# In[64]:
-
-
 from random import randint
 
 def prediction(location_name, year, month, day):
-  #loc = get_id(location_name, year, month, day)
-  #loc = loc
+  # Calling the location function to get the path of the downloaded h5 file
   data = Location(location_name)
       
   if __name__ == '__main__':
       log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
       logging.basicConfig(level=logging.INFO, format=log_fmt)
       main()
-    #main()
-
-
-    # In[44]:
-
 
   model = "./models/mse_model.h5"
   mse_model = tf.keras.models.load_model(model,compile=False,custom_objects={"tf":tf})
 
   x_test, y_test = read_data('./nowcast_testing.h5', end=50)
-
 
   loc = randint(10,19)
   y_pred = mse_model.predict(x_test)
@@ -807,10 +654,6 @@ def prediction(location_name, year, month, day):
 
   res = imgsave(loc ,location_name, y_preds)
   return res
-
-
-# In[67]:
-
 
 y_preds=[]
 norm = {'scale':47.54,'shift':33.44}
@@ -824,20 +667,14 @@ hmf_colors = np.array( [
 def imgsave(id,location_name, y_preds):
   y_preds=np.asarray(y_preds)
   y_preds=y_preds[0]
-  #print(y_preds[id])
-  #print(type(y_preds))
   filepath = "./images/"
-  #return filepath 
   
   for i in range(0,12):
-    #print(y_preds[id])
     y_data= y_preds[id,:,:,i]
     filepath = "./images/"
     path = os.path.join(filepath, location_name)
     os.makedirs(path, exist_ok = True)
     plt.imsave("./images/"+ str(location_name) + "/images" + str(i) + ".jpg", y_data)
-
-
 
   this_file_path = "./images/"+ str(location_name) +"/"
 
@@ -890,13 +727,7 @@ def imgsave(id,location_name, y_preds):
   return filepath
 
 
-# In[68]:
-
-
 #prediction('Miami', 2019, 2,1)
-
-
-# In[ ]:
 
 
 
