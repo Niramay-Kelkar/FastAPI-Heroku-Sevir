@@ -7,3 +7,4 @@ gunicorn
 geopy
 matplotlib
 boto3
+h5py
