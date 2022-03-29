@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 #from nowcast_reader import read_data
 from LocationFetch2 import *
 
-app = FastAPI()
 from typing import Optional
 
 from fastapi import FastAPI
