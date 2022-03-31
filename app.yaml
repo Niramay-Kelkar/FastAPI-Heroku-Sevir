@@ -1,2 +1,2 @@
-runtime: python36
-entrypoint: gunicorn -w 4 -k uvicorn.workers.UvicornWorker apinew : app
+runtime: python38
+entrypoint: gunicorn -w 4 -k uvicorn.workers.UvicornWorker apinew:app
