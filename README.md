@@ -16,7 +16,7 @@ $ uvicorn apinew:app --reload
 #### Streamlit:
 $ streamlit run streamlit.py
 
-- It will run on http://localhost:8501/ 
+- It will run on http://34.134.17.190:8501/ 
 - Streamlit shows the visual outputs(merged image and gif) upon providing the location from the client
 
 
