@@ -110,7 +110,7 @@ def Location(location_name):
 
 
 # In[25]:
-from nowcast_reader import read_data
+from readers.nowcast_reader import read_data
 '''
 from nowcast_reader import read_data
 model = "./mse_model.h5"
