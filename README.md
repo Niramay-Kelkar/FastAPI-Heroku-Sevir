@@ -23,6 +23,10 @@ $ streamlit run streamlit.py
 ### References:
 - https://docs.streamlit.io/library/api-reference/media/st.video
 - https://www.youtube.com/watch?v=lzp6YvJMRL4
+- https://towardsdatascience.com/how-to-add-a-user-authentication-service-in-streamlit-a8b93bf02031
+- https://www.youtube.com/watch?v=6hTRw_HK3Ts
+
+
 
 
 “WE ATTEST THAT WE HAVEN’T USED ANY OTHER STUDENTS’ WORK IN OUR ASSIGNMENT AND ABIDE BY THE POLICIES LISTED IN THE STUDENT HANDBOOK”
